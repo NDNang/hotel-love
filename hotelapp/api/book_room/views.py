@@ -14,7 +14,7 @@ class BookRoomView(generics.GenericAPIView):
     queryset = BookRoom.objects.all()
 
     def get(self,request):
-        book_rooms = BookRoom.objects.all()
+        book_rooms = BookRoom.objects.all().select_related()
         serializer = self.serializer_class(instance=book_rooms,many = True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
     

@@ -38,7 +38,7 @@ class ImageRoom(common):
 
 class ExtraService(common):
     name = models.CharField(max_length=500,blank=True,null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=3,blank=True,null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=0,blank=True,null=True)
     class Meta:
         db_table = "extra_service"
 

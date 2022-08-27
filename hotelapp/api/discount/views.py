@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 # Create your views here.
 
-class DiscounView(generics.GenericAPIView):
+class DiscountView(generics.GenericAPIView):
     serializer_class = serializers.DiscountSerializer
     queryset = Discount.objects.all()
 
