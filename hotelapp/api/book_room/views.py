@@ -2,11 +2,12 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import BookRoom
+from hotelapp.models import BookRoom,Customer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
+from django.db import DatabaseError, transaction
 # Create your views here.
 
 class BookRoomView(generics.GenericAPIView):
@@ -17,16 +18,31 @@ class BookRoomView(generics.GenericAPIView):
         book_rooms = BookRoom.objects.all().select_related()
         serializer = self.serializer_class(instance=book_rooms,many = True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
-    
+
     def post(self,request):
         data = request.data
-        serializer = self.serializer_class(data=data)
-        if serializer.is_valid():
-            serializer.save()
+        fullname = data["fullname"]
+        phone = data['phone']
+        date = data['date']
+        time_in = data['time_in']
+        time_out = data['time_out']
+        # status = data['status']
+        print(data)
+        with transaction.atomic():
+            cus = Customer(fullname=fullname,phone = phone)
+            cus.save()
+            sid = transaction.savepoint()
+            print(cus.id)
+            
 
-            return Response(data=serializer.data,status=status.HTTP_201_CREATED)
-        
-        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        # serializer = self.serializer_class(data=data)
+        # if serializer.is_valid():
+        #     serializer.save()
+
+        #     return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+
+        # return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_201_CREATED)
 
 class BookRoomIdView(generics.GenericAPIView):
     serializer_class = serializers.BookRoomSerializer
@@ -50,7 +66,7 @@ class BookRoomIdView(generics.GenericAPIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self,request,pk):
         book_rooms = self.get_object(pk)
         book_rooms.delete()

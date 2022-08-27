@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer,ReadOnlyField,CharField,ListField
+from rest_framework.serializers import ModelSerializer,ReadOnlyField,CharField,PrimaryKeyRelatedField
 from hotelapp.models import BookRoom,ServiceRoom,ExtraService
 
 
