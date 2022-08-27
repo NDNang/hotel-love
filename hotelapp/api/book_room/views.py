@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import BookRoom,Customer
+from hotelapp.models import BookRoom,Customer, Room
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -63,6 +63,9 @@ class BookRoomIdView(generics.GenericAPIView):
         serializer = self.serializer_class(instance=book_rooms,data=request.data)
         if serializer.is_valid():
             serializer.save()
+            room = Room.object.get(pk=book_rooms.room_id)
+            room.status = serializer.status
+            room.save()
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
