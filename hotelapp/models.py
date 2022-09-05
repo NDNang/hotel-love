@@ -48,14 +48,9 @@ class BookRoom(common):
     date = models.DateTimeField()
     time_in = models.TimeField()
     time_out = models.TimeField()
+    extra_service = models.ManyToManyField('ExtraService',related_name='extra_service')
     class Meta:
         db_table="book_room" 
-
-class ServiceRoom(common):
-    service = models.ForeignKey(ExtraService,on_delete=models.CASCADE)
-    book_room = models.ForeignKey(BookRoom,on_delete=models.CASCADE)
-    class Meta:
-        db_table ="service_room"
 
 class Discount(common):
     room = models.ForeignKey(Room,on_delete=models.CASCADE)

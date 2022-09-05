@@ -21,28 +21,13 @@ class BookRoomView(generics.GenericAPIView):
 
     def post(self,request):
         data = request.data
-        fullname = data["fullname"]
-        phone = data['phone']
-        date = data['date']
-        time_in = data['time_in']
-        time_out = data['time_out']
-        # status = data['status']
-        print(data)
-        with transaction.atomic():
-            cus = Customer(fullname=fullname,phone = phone)
-            cus.save()
-            sid = transaction.savepoint()
-            print(cus.id)
-            
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
 
-        # serializer = self.serializer_class(data=data)
-        # if serializer.is_valid():
-        #     serializer.save()
+            return Response(data=serializer.data,status=status.HTTP_201_CREATED)
 
-        #     return Response(data=serializer.data,status=status.HTTP_201_CREATED)
-
-        # return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class BookRoomIdView(generics.GenericAPIView):
     serializer_class = serializers.BookRoomSerializer

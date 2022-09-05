@@ -10,5 +10,4 @@ urlpatterns = [
     path('api/v1/', include('hotelapp.api.extra_service.urls')),
     path('api/v1/', include('hotelapp.api.image_room.urls')),
     path('api/v1/', include('hotelapp.api.list_room.urls')),
-    path('api/v1/', include('hotelapp.api.service_room.urls')),
 ]
