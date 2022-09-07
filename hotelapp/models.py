@@ -45,7 +45,7 @@ class ExtraService(common):
 class Code(common):
     name = models.CharField(max_length=8,blank=True,null=True)
     class Meta:
-        db_table ="code"
+        db_table ="list_code"
 
 class BookRoom(common):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
