@@ -42,7 +42,7 @@ class ExtraService(common):
     class Meta:
         db_table = "extra_service"
 
-class Code(common):
+class ListCode(common):
     name = models.CharField(max_length=8,blank=True,null=True)
     class Meta:
         db_table ="list_code"
@@ -50,7 +50,7 @@ class Code(common):
 class BookRoom(common):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
     room = models.ForeignKey(Room,on_delete=models.CASCADE)
-    code = models.ForeignKey(Code,on_delete=models.CASCADE)
+    code = models.ForeignKey(ListCode,on_delete=models.CASCADE)
     date_in = models.DateTimeField()
     date_out = models.DateTimeField()
     extra_service = models.ManyToManyField('ExtraService',related_name='book_room',blank=True)
