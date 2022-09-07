@@ -12,8 +12,8 @@ class Customer(common):
     
     fullname= models.CharField(max_length=250)
     phone = models.IntegerField()
-    sum_success = models.IntegerField(blank=True,null=True)
-    sum_fail = models.IntegerField(blank=True,null=True)
+    sum_success = models.IntegerField(default=0,blank=True,null=True)
+    sum_fail = models.IntegerField(default=0,blank=True,null=True)
     class Meta:
         db_table ="customer"
     
@@ -42,13 +42,20 @@ class ExtraService(common):
     class Meta:
         db_table = "extra_service"
 
+class Code(common):
+    name = models.CharField(max_length=8,blank=True,null=True)
+    class Meta:
+        db_table ="code"
+
 class BookRoom(common):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
     room = models.ForeignKey(Room,on_delete=models.CASCADE)
-    date = models.DateTimeField()
-    time_in = models.TimeField()
-    time_out = models.TimeField()
-    extra_service = models.ManyToManyField('ExtraService',related_name='extra_service')
+    code = models.ForeignKey(Code,on_delete=models.CASCADE)
+    date_in = models.DateTimeField()
+    date_out = models.DateTimeField()
+    extra_service = models.ManyToManyField('ExtraService',related_name='book_room',blank=True)
+    is_pay = models.BooleanField(default=False)
+    total = models.DecimalField(max_digits=10, decimal_places=0,blank=True,null=True)
     class Meta:
         db_table="book_room" 
 

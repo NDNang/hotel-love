@@ -12,5 +12,12 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('token/', JWTTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('', include('hotelapp.api.book_room.urls')),
+    path('', include('hotelapp.api.customer.urls')),
+    path('', include('hotelapp.api.discount.urls')),
+    path('', include('hotelapp.api.extra_service.urls')),
+    path('', include('hotelapp.api.image_room.urls')),
+    path('', include('hotelapp.api.list_room.urls')),
+    path('', include('hotelapp.api.render_code.urls')),
     # path('',include(router.urls)),
 ]
