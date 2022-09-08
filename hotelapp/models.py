@@ -50,7 +50,7 @@ class ListCode(common):
 class BookRoom(common):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
     room = models.ForeignKey(Room,on_delete=models.CASCADE)
-    code_pay = models.ForeignKey(ListCode,on_delete=models.CASCADE)
+    code = models.ForeignKey(ListCode,on_delete=models.CASCADE)
     date_in = models.DateTimeField()
     date_out = models.DateTimeField()
     extra_service = models.ManyToManyField('ExtraService',related_name='book_room',blank=True)

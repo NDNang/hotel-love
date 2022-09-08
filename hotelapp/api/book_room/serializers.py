@@ -6,7 +6,7 @@ class BookRoomSerializer(ModelSerializer):
     fullname = CharField(source='customer.fullname')
     phone = CharField(source='customer.phone')
     room_name = CharField(allow_blank=True, allow_null=True,source='room.name')
-    code_name = CharField(allow_blank=True, allow_null=True,source='code_pay.name')
+    code_name = CharField(allow_blank=True, allow_null=True,source='code.name')
     class Meta:
         model = BookRoom
         fields = '__all__'
