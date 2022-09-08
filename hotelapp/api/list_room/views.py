@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import Room,BookRoom
+from hotelapp.models import Room,BookRoom,Discount
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
@@ -73,5 +73,20 @@ class RoomFilter(generics.GenericAPIView):
         room_id = BookRoom.objects.values_list('room_id',flat=True).filter((Q(date_in__range=(date_in, date_out)) | Q(date_out__range=(date_in, date_out))) & (Q(status=True)))
         data = Room.objects.filter(~Q(pk__in = set(room_id)))
         serializer = self.serializer_class(instance=data,many = True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
+        
+        ls_data =[]
+        for item in serializer.data:
+            percent = 0
+            date_start =""
+            date_end =""
+            discount = Discount.objects.values().filter(room_id = item['id'],status=True)
+            if discount:
+                percent = int(discount[0]['percent'])
+                date_start = datetime.strptime(str(discount[0]['date_start']),'%Y-%m-%d %H:%M:%S+00:00').strftime('%d/%m/%Y %H:%M:%S')
+                date_end = datetime.strptime(str(discount[0]['date_end']),'%Y-%m-%d %H:%M:%S+00:00').strftime('%d/%m/%Y %H:%M:%S')
+            price = float(item['price'])
+            total = round(price - (price*percent/100))
+            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'price':'{:0,.2f}'.format(price),'images':item['images'],'total':'{:0,.2f}'.format(total),'discount':percent,'date_start':date_start,'date_end':date_end}
+            ls_data.append(obj)
+        return Response(data=ls_data,status=status.HTTP_200_OK)
        
