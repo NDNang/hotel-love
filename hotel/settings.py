@@ -102,19 +102,19 @@ SIMPLE_JWT = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 DATABASES={}
 
-# if DEBUG:
-#  DATABASES['default'] = {
-#         'ENGINE': 'django.db.backends.mysql', 
-#         'NAME': config('DATABASE'),
-#         'USER': config("USER_MYSQL"),
-#         'PASSWORD': config("PASS_MYSQL"),
-#         'HOST': config('HOSTNAME'),
-#         'PORT': config('PORT'),
-#     }
+if DEBUG:
+ DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': config('DATABASE'),
+        'USER': config("USER_MYSQL"),
+        'PASSWORD': config("PASS_MYSQL"),
+        'HOST': config('HOSTNAME'),
+        'PORT': config('PORT'),
+    }
 
-# else:
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
-DATABASES['default'] = dj_database_url.config(default=config('DATABASE_URL'))
+else:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    DATABASES['default'] = dj_database_url.config(default=config('DATABASE_URL'))
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
