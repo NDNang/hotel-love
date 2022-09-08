@@ -70,7 +70,7 @@ class RoomFilter(generics.GenericAPIView):
         queryprms = request.GET
         date_in = datetime.strptime(queryprms.get('date_in'),'%Y-%m-%dT%H:%M:%SZ')
         date_out = datetime.strptime(queryprms.get('date_out'),'%Y-%m-%dT%H:%M:%SZ')
-        room_id = BookRoom.objects.values_list('room_id',flat=True).filter((Q(date_in__range=(date_in, date_out)) | Q(date_out__range=(date_in, date_out))) & (Q(status=True)))
+        room_id = BookRoom.objects.filter((Q(date_in__range=(date_in, date_out)) | Q(date_out__range=(date_in, date_out))) & (Q(status=True))).values_list('room_id',flat=True)
         data = Room.objects.filter(~Q(pk__in = set(room_id)))
         serializer = self.serializer_class(instance=data,many = True)
         
@@ -79,7 +79,7 @@ class RoomFilter(generics.GenericAPIView):
             percent = 0
             date_start =""
             date_end =""
-            discount = Discount.objects.values().filter(room_id = item['id'],status=True)
+            discount = Discount.objects.filter(room_id = item['id'],status=True).values()
             if discount:
                 percent = int(discount[0]['percent'])
                 date_start = datetime.strptime(str(discount[0]['date_start']),'%Y-%m-%d %H:%M:%S+00:00').strftime('%d/%m/%Y %H:%M:%S')
