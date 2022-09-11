@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import BookRoom,Customer, Room,ExtraService
+from hotelapp.models import BookRoom,Customer, Room,ExtraService,ListCode
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -41,7 +41,6 @@ class BookRoomView(generics.GenericAPIView):
                     cus = Customer(fullname = data['fullname'],phone=data['phone'])
                     cus.save()
                     data['customer'] = cus.id
-            
                 serializer = self.serializer_class(data=data)
                 if serializer.is_valid():
                     serializer.save()

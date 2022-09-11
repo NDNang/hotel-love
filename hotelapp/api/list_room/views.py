@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import Room,BookRoom,Discount
+from hotelapp.models import Room,BookRoom,Discount,ImageRoom
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
@@ -82,11 +82,18 @@ class RoomFilter(generics.GenericAPIView):
             discount = Discount.objects.filter(room_id = item['id'],status=True).values()
             if discount:
                 percent = int(discount[0]['percent'])
-                date_start = datetime.strptime(str(discount[0]['date_start']),'%Y-%m-%d %H:%M:%S+00:00').strftime('%d/%m/%Y %H:%M:%S')
-                date_end = datetime.strptime(str(discount[0]['date_end']),'%Y-%m-%d %H:%M:%S+00:00').strftime('%d/%m/%Y %H:%M:%S')
+                date_start =discount[0]['date_start'].strftime('%d/%m/%Y %H:%M:%S')
+                date_end =discount[0]['date_end'].strftime('%d/%m/%Y %H:%M:%S')
             price = float(item['price'])
             total = round(price - (price*percent/100))
-            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'price':'{:0,.2f}'.format(price),'images':item['images'],'total':'{:0,.2f}'.format(total),'discount':percent,'date_start':date_start,'date_end':date_end}
+            image_rooms = ImageRoom.objects.filter(room_id = item['id'],status=True).values()
+            ls_images = []
+            images = {}
+            for img in image_rooms:
+                url = 'static/images'+img['images']
+                images={'id':img['id'],'title':item['title'],'url':url}
+                ls_images.append(images)
+            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'price':'{:0,.0f}'.format(price),'images':item['images'],'total':'{:0,.0f}'.format(total),'discount':percent,'date_start':date_start,'date_end':date_end,'ls_images':ls_images}
             ls_data.append(obj)
         return Response(data=ls_data,status=status.HTTP_200_OK)
        
