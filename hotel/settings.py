@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'rest_framework',
@@ -158,15 +157,14 @@ USE_TZ = True
 
 STATIC_HOST = os.environ.get("DJANGO_STATIC_HOST", "")
 STATIC_URL = STATIC_HOST + "/static/"
-STATIC_ROOT= os.path.join(BASE_DIR , 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-MEDIA_URL = '/images/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR , 'static')
 ]
 
+STATIC_ROOT= os.path.join(BASE_DIR , 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = '/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'images')
 
 # Default primary key field type
