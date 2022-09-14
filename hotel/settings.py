@@ -113,7 +113,7 @@ if DEBUG:
         'USER': config("USER_MYSQL"),
         'PASSWORD': config("PASS_MYSQL"),
         'HOST': config('HOSTNAME'),
-        'PORT': config('PORT'),
+        # 'PORT': config('PORT'),
     }
 
 else:
