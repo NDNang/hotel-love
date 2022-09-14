@@ -15,7 +15,12 @@ class BookRoomView(generics.GenericAPIView):
     queryset = BookRoom.objects.all()
 
     def get(self,request):
-        book_rooms = BookRoom.objects.filter(status=True).order_by('date_in', 'date_out')
+        if request.GET:
+            code = request.GET['code']
+            code_id = ListCode.objects.get(name = code)
+            book_rooms = BookRoom.objects.filter(code_id = code_id)
+        else:
+            book_rooms = BookRoom.objects.filter(status=True).order_by('date_in', 'date_out')
         serializer = self.serializer_class(instance=book_rooms,many = True)
         data = []
         for item in serializer.data:
