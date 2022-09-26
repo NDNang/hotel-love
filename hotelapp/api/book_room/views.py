@@ -35,10 +35,11 @@ class BookRoomView(generics.GenericAPIView):
         return Response(data=data,status=status.HTTP_200_OK)
 
     def post(self,request):
-        data = request.data
-        customer = Customer.objects.filter(phone = data['phone']).values('id')
-        data._mutable = True
         try:
+            request.POST._mutable = True
+            data = request.data
+            # data._mutable = True
+            customer = Customer.objects.filter(phone = data['phone']).values('id')
             with transaction.atomic():
                 if customer:
                     data['customer'] = customer[0]['id']
