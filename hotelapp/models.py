@@ -11,7 +11,7 @@ class common(models.Model):
 class Customer(common):
     
     fullname= models.CharField(max_length=250)
-    phone = models.IntegerField()
+    phone = models.CharField(max_length=11)
     sum_success = models.IntegerField(default=0,blank=True,null=True)
     sum_fail = models.IntegerField(default=0,blank=True,null=True)
     class Meta:
@@ -22,7 +22,7 @@ class Room(common):
     name= models.CharField(max_length=500)
     title= models.CharField(max_length=1000,blank=True,null=True)
     description = models.CharField(max_length=1000,blank=True,null=True)
-    type = models.IntegerField(blank=True,null=True)
+    type = models.CharField(max_length=50,blank=True,null=True)
     price = models.DecimalField(default=0,max_digits=10, decimal_places=0,blank=True,null=True)
     images  = models.FileField(blank=True, null=True)
     class Meta:
@@ -48,9 +48,10 @@ class ListCode(common):
         db_table ="list_code"
 
 class BookRoom(common):
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,blank=True,null=True)
     room = models.ForeignKey(Room,on_delete=models.CASCADE)
-    code = models.ForeignKey(ListCode,on_delete=models.CASCADE)
+    code = models.ForeignKey(ListCode,on_delete=models.CASCADE,blank=True,null=True)
+    type_book = models.ForeignKey('TypeBook',on_delete=models.CASCADE,blank=True,null=True)
     date_in = models.DateTimeField()
     date_out = models.DateTimeField()
     extra_service = models.ManyToManyField('ExtraService',related_name='book_room',blank=True)
@@ -66,3 +67,28 @@ class Discount(common):
     date_end = models.DateTimeField()
     class Meta:
         db_table ="discount_room"
+
+class TypeBook(common):
+    name = models.CharField(max_length=150,blank=True,null=True)
+    class Meta:
+        db_table ="type_books"
+
+class TimeHours(common):
+    is_hours = models.CharField(max_length=20,blank=True,null=True)
+    is_date = models.CharField(max_length=20,blank=True,null=True)
+    type_book = models.ForeignKey(TypeBook,on_delete=models.CASCADE,blank=True,null=True)
+    class Meta:
+        db_table ="time_hours"
+
+class PriceRoom(common):
+    name= models.CharField(max_length=200,blank=True,null=True)
+    price = models.CharField(max_length=200,blank=True,null=True)
+    room = models.ForeignKey(Room,on_delete=models.CASCADE)
+    class Meta:
+        db_table ="price_rooms"
+
+class FreeServiceRoom(common):
+    name= models.CharField(max_length=200,blank=True,null=True)
+    room = models.ForeignKey(Room,on_delete=models.CASCADE)
+    class Meta:
+        db_table ="free_services"

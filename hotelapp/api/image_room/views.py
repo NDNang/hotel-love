@@ -28,7 +28,7 @@ class ImageRoomView(generics.GenericAPIView):
                     title=data['title'],
                     description=data['description'],
                     images=image,
-                    room_id=data['room_id'],
+                    room_id=data['room'],
                 )
             return Response(status=status.HTTP_201_CREATED)
         except:

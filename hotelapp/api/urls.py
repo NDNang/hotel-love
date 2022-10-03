@@ -19,5 +19,9 @@ urlpatterns = [
     path('', include('hotelapp.api.image_room.urls')),
     path('', include('hotelapp.api.list_room.urls')),
     path('', include('hotelapp.api.render_code.urls')),
+    path('', include('hotelapp.api.time_hours.urls')),
+    path('', include('hotelapp.api.type_book.urls')),
+    path('', include('hotelapp.api.price_room.urls')),
+    path('', include('hotelapp.api.free_services.urls')),
     # path('',include(router.urls)),
 ]

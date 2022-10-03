@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import Room,BookRoom,Discount,ImageRoom
+from hotelapp.models import ExtraService, FreeServiceRoom, PriceRoom, Room,BookRoom,Discount,ImageRoom, TypeBook
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
@@ -31,7 +31,7 @@ class RoomView(generics.GenericAPIView):
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class RoomIdView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = serializers.RoomSerializer
     def get_object(self,pk):
         try:
@@ -90,10 +90,34 @@ class RoomFilter(generics.GenericAPIView):
             ls_images = []
             images = {}
             for img in image_rooms:
-                url = 'static/images'+img['images']
+                url = 'static/images/'+img['images']
                 images={'id':img['id'],'title':item['title'],'url':url}
                 ls_images.append(images)
             obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'price':'{:0,.0f}'.format(price),'images':item['images'],'total':'{:0,.0f}'.format(total),'discount':percent,'date_start':date_start,'date_end':date_end,'ls_images':ls_images}
             ls_data.append(obj)
         return Response(data=ls_data,status=status.HTTP_200_OK)
-       
+
+class ListRoomOffice(generics.GenericAPIView):
+    serializer_class = serializers.RoomSerializer
+    queryset = Room.objects.all()
+    def get(self,request):
+        rooms = Room.objects.all()
+        serializer = self.serializer_class(instance=rooms,many = True)
+        ls_data =[]
+        status_room = False
+        for item in serializer.data:
+            image_rooms = ImageRoom.objects.filter(room_id = item['id'],status=True).values()
+            ls_images = []
+            images = {}
+            for img in image_rooms:
+                url = 'static/images/'+img['images']
+                images={'id':img['id'],'title':item['title'],'url':url}
+                ls_images.append(images)
+            price_rooms=PriceRoom.objects.filter(room_id = item['id']).values('name','price')
+            services = ExtraService.objects.all().values('id','name')
+            free_service = FreeServiceRoom.objects.filter(room_id = item['id']).values('name')
+            type_book = TypeBook.objects.all().values('id','name')
+            status_room = BookRoom.objects.filter(room_id = item['id'],status=True).values('status')
+            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'images':item['images'],'ls_images':ls_images,'ls_prices':price_rooms,'services':services,'free_service':free_service,'type_book':type_book,'status_room':status_room}
+            ls_data.append(obj)
+        return Response(data=ls_data,status=status.HTTP_200_OK)

@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.http import Http404
 from django.db import DatabaseError, transaction
+import pandas as pd
 # Create your views here.
 
 class BookRoomView(generics.GenericAPIView):
@@ -104,3 +105,44 @@ class BookRoomIdStatus(generics.GenericAPIView):
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
+class BookRoomOffice(generics.GenericAPIView):
+    serializer_class = serializers.BookRoomOficeSerializer
+    def get(self,request):
+        book_rooms = BookRoom.objects.filter(status=True).order_by('date_in', 'date_out')
+        serializer = self.serializer_class(instance=book_rooms,many = True)
+        data = []
+        for item in serializer.data:
+            arr_service_name =[]
+            obj = {'id':item['id'],'room':item['room_name'],
+            'date_in':item['date_in'],'date_out':item['date_out'],'total':item['total'],'is_pay':item['is_pay']}
+            for val in item['extra_service']:
+                service = ExtraService.objects.filter(pk=val).values('id','name')
+                arr_service_name.append(service)
+            obj['extra_service']  = arr_service_name  
+            data.append(obj)
+        return Response(data=data,status=status.HTTP_200_OK)
+    def post(self,request):
+        try:
+            data = request.data
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+        except DatabaseError:
+            transaction.rollback()
+        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class BookRoomOfficeStatus(generics.GenericAPIView):
+    serializer_class = serializers.BookRoomOficeSerializer
+    def put(self,request,pk):
+        try:
+            request.PUT._mutable = True
+            data = request.data
+            book_room = BookRoom.objects.get(pk=pk)
+            calculator_hours = pd.Timestamp(pd.Timestamp(data['date_out'])-pd.Timestamp(book_room.date_in)).hour
+            serializer = self.serializer_class(instance=book_room,data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data,status=status.HTTP_200_OK)
+        except BookRoom.DoesNotExist:
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
