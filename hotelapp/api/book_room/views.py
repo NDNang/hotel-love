@@ -2,7 +2,7 @@ from gc import get_objects
 from django.shortcuts import render
 from rest_framework import generics,viewsets,status
 from . import serializers
-from hotelapp.models import BookRoom,Customer, Room,ExtraService,ListCode
+from hotelapp.models import BookRoom,Customer, Room,ExtraService,ListCode, TypeBook
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -107,14 +107,16 @@ class BookRoomIdStatus(generics.GenericAPIView):
 
 class BookRoomOffice(generics.GenericAPIView):
     serializer_class = serializers.BookRoomOficeSerializer
+    queryset = BookRoom.objects.all()
     def get(self,request):
         book_rooms = BookRoom.objects.filter(status=True).order_by('date_in', 'date_out')
         serializer = self.serializer_class(instance=book_rooms,many = True)
         data = []
         for item in serializer.data:
             arr_service_name =[]
-            obj = {'id':item['id'],'room':item['room_name'],
-            'date_in':item['date_in'],'date_out':item['date_out'],'total':item['total'],'is_pay':item['is_pay']}
+            room_name = Room.objects.get(pk=item['room']).name
+            type_book = TypeBook.objects.get(pk=item['type_book']).name
+            obj = {'id':item['id'],'room_name':room_name,'type_book':type_book,'date_in':item['date_in'],'date_out':item['date_out'],'total':item['total'],'is_pay':item['is_pay']}
             for val in item['extra_service']:
                 service = ExtraService.objects.filter(pk=val).values('id','name')
                 arr_service_name.append(service)
@@ -132,17 +134,42 @@ class BookRoomOffice(generics.GenericAPIView):
             transaction.rollback()
         return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class BookRoomOfficeStatus(generics.GenericAPIView):
+
+class BookRoomIdOffice(generics.GenericAPIView):
     serializer_class = serializers.BookRoomOficeSerializer
-    def put(self,request,pk):
+    def get_object(self,pk):
         try:
-            request.PUT._mutable = True
-            data = request.data
-            book_room = BookRoom.objects.get(pk=pk)
-            calculator_hours = pd.Timestamp(pd.Timestamp(data['date_out'])-pd.Timestamp(book_room.date_in)).hour
-            serializer = self.serializer_class(instance=book_room,data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(data=serializer.data,status=status.HTTP_200_OK)
+            return BookRoom.objects.get(pk=pk)
         except BookRoom.DoesNotExist:
-            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            raise Http404
+
+    def get(self,request,pk):
+        book_rooms= self.get_object(pk)
+        serializer=self.serializer_class(instance=book_rooms)
+
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+    def put(self,request,pk):
+        book_rooms = self.get_object(pk)
+        serializer = self.serializer_class(instance=book_rooms,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class BookRoomOfficeStatus(generics.GenericAPIView):
+    serializer_class = serializers.BookRoomStatusSerializer
+    def get_object(self,pk):
+        try:
+            return BookRoom.objects.get(pk=pk)
+        except BookRoom.DoesNotExist:
+            raise Http404
+    def put(self,request,pk):
+        book_rooms = self.get_object(pk)
+        serializer = self.serializer_class(instance=book_rooms,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+        return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
