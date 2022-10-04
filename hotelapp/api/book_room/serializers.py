@@ -16,7 +16,7 @@ class BookRoomStatusSerializer(ModelSerializer):
         model = BookRoom
         fields = ['id','is_pay','status','date_out']
 
-class BookRoomOficeSerializer(ModelSerializer):
+class BookRoomOfficeSerializer(ModelSerializer):
     class Meta:
         model = BookRoom
         fields = '__all__'

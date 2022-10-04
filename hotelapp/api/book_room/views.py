@@ -106,7 +106,7 @@ class BookRoomIdStatus(generics.GenericAPIView):
 
 
 class BookRoomOffice(generics.GenericAPIView):
-    serializer_class = serializers.BookRoomOficeSerializer
+    serializer_class = serializers.BookRoomOfficeSerializer
     queryset = BookRoom.objects.all()
     def get(self,request):
         book_rooms = BookRoom.objects.filter(status=True).order_by('date_in', 'date_out')
@@ -116,10 +116,10 @@ class BookRoomOffice(generics.GenericAPIView):
             arr_service_name =[]
             room_name = Room.objects.get(pk=item['room']).name
             type_book = TypeBook.objects.get(pk=item['type_book']).name
-            obj = {'id':item['id'],'room_name':room_name,'type_book':type_book,'date_in':item['date_in'],'date_out':item['date_out'],'total':item['total'],'is_pay':item['is_pay']}
+            obj = {'id':item['id'],'room_name':room_name,'type_book':type_book,'date_in':item['date_in'],'date_out':item['date_out'],'total':item['total'],'is_pay':item['is_pay'], 'status': item['status'] }
             for val in item['extra_service']:
                 service = ExtraService.objects.filter(pk=val).values('id','name')
-                arr_service_name.append(service)
+                arr_service_name.append(service[0])
             obj['extra_service']  = arr_service_name  
             data.append(obj)
         return Response(data=data,status=status.HTTP_200_OK)
@@ -136,7 +136,7 @@ class BookRoomOffice(generics.GenericAPIView):
 
 
 class BookRoomIdOffice(generics.GenericAPIView):
-    serializer_class = serializers.BookRoomOficeSerializer
+    serializer_class = serializers.BookRoomOfficeSerializer
     def get_object(self,pk):
         try:
             return BookRoom.objects.get(pk=pk)

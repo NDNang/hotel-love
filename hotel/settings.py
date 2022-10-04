@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS=["http://localhost:4200","https://chiichouse.com",]
+CORS_ALLOWED_ORIGINS=["http://localhost:4200","http://localhost:5200","https://chiichouse.com",]
 
 ROOT_URLCONF = 'hotel.urls'
 

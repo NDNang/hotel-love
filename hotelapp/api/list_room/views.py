@@ -118,6 +118,9 @@ class ListRoomOffice(generics.GenericAPIView):
             free_service = FreeServiceRoom.objects.filter(room_id = item['id']).values('name')
             type_book = TypeBook.objects.all().values('id','name')
             status_room = BookRoom.objects.filter(room_id = item['id'],status=True).values('status')
-            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'images':item['images'],'ls_images':ls_images,'ls_prices':price_rooms,'services':services,'free_service':free_service,'type_book':type_book,'status_room':status_room}
+            _status = False
+            if status_room:
+                _status = status_room[0]['status']
+            obj ={'id':item['id'],'name':item['name'],'title':item['title'],'description':item['description'],'type':item['type'],'images':item['images'],'ls_images':ls_images,'ls_prices':price_rooms,'services':services,'free_service':free_service,'type_book':type_book,'status_room': _status}
             ls_data.append(obj)
         return Response(data=ls_data,status=status.HTTP_200_OK)
